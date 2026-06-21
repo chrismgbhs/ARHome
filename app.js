@@ -134,6 +134,8 @@ const QUICKLINKS_CUSTOMER = [
   {label:'㉑ Partner Stores', id:'stores'},
   {label:'㉒ Saved Items', id:'saved'},
   {label:'㉓ Services', id:'services'},
+  {label:'㉔ Hire a Designer', id:'designer-directory'},
+  {label:'㉕ Designer Profile', id:'designer-profile'},
 ];
 
 const QUICKLINKS_DESIGNER = [

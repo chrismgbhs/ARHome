@@ -50,7 +50,7 @@ SCREENS['splash'] = {
         </div>
         <div>
           <div style="font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:#3a2c18;">AR Home</div>
-          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Where vision meets the reality</div>
+          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Design it before you buy it</div>
         </div>
         <div class="hint-pill" style="margin-top:30px; background:rgba(58,44,24,0.85);">Tap to begin →</div>
       </div>
@@ -621,7 +621,111 @@ function orderHistRow(id,status,total){
 }
 
 // ---------------------------------------------------------------
-// 15. SERVICES
+// 15b. HIRE A DESIGNER — customer-facing directory + profile
+// ---------------------------------------------------------------
+SCREENS['designer-directory'] = {
+  flow:'customer', tabbar:false, crumbs:['Services','Hire a Designer'],
+  note:'Customer-facing designer directory. Tap a designer card to view their profile and request a consultation.',
+  render(){
+    return `
+    ${statusRow()}
+    ${header('Hire a Designer')}
+    <div class="content" style="padding-top:6px;">
+      <div class="search-bar"><input placeholder="Search designers..."></div>
+      <div class="pill-row">
+        ${['All','Modern Minimalist','Eclectic','Scandinavian','Budget-Friendly'].map((p,i)=>`<div class="filter-pill ${i===0?'active':''}">${p}</div>`).join('')}
+      </div>
+      <div class="muted small" style="margin:2px 0 16px; line-height:1.6;">Browse vetted interior designers who specialize in AR mock-ups, so you can preview their work in your own space before committing.</div>
+
+      ${designerCard('avatar_julia','Julia Briones','Modern Minimalist','Manila, PH', 4.9, 38, true)}
+      ${designerCard('avatar_sarah','Mika Santos','Scandinavian','Quezon City, PH', 4.8, 26, false)}
+      ${designerCard('avatar_lisa','Renee Cruz','Eclectic','Cebu City, PH', 4.7, 19, false)}
+      ${designerCard('avatar_markp','Diego Reyes','Budget-Friendly','Pasig City, PH', 4.6, 14, false)}
+    </div>
+    `;
+  }
+};
+function designerCard(avatarKey,name,specialty,location,rating,reviews,featured){
+  return `<div class="card" style="padding:14px; margin-bottom:14px; cursor:pointer; ${featured?'border-color:var(--gold); background:#FFFBF0;':''}" onclick="goTo('designer-profile')">
+    <div class="row gap12">
+      <div class="avatar" style="background-image:url('${IMG[avatarKey]}')"></div>
+      <div class="grow">
+        <div class="row between">
+          <div style="font-weight:800; font-size:14.5px;">${name}</div>
+          ${featured ? '<div class="badge badge-gold">Featured</div>' : ''}
+        </div>
+        <div class="muted small">${specialty} · ${location}</div>
+        <div class="stars row gap6" style="margin-top:4px;">${ICON.star} ${rating} · ${reviews} reviews</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+SCREENS['designer-profile'] = {
+  flow:'customer', tabbar:false, crumbs:['Hire a Designer','Profile'],
+  note:'Designer profile from the customer side — portfolio preview, reviews, and a Request Consultation CTA that starts a project intake.',
+  render(){
+    return `
+    ${statusRow()}
+    ${header('Designer Profile', {right:`<div class="icon-btn">${ICON.heart}</div>`})}
+    <div class="content" style="padding-top:6px;">
+      <div class="row gap14" style="margin-bottom:14px;">
+        <div class="avatar lg" style="background-image:url('${IMG.avatar_julia}')"></div>
+        <div class="grow">
+          <div style="font-weight:800; font-size:17px;">Julia Briones</div>
+          <div class="muted small">Modern Minimalist · Manila, PH</div>
+          <div class="stars row gap6" style="margin-top:4px;">${ICON.star} 4.9 · 38 reviews</div>
+        </div>
+      </div>
+      <div class="row gap10" style="margin-bottom:18px;">
+        <div class="card grow" style="padding:10px; text-align:center;"><div style="font-weight:800;">6 yrs</div><div class="muted" style="font-size:10.5px;">Experience</div></div>
+        <div class="card grow" style="padding:10px; text-align:center;"><div style="font-weight:800;">120+</div><div class="muted" style="font-size:10.5px;">Projects</div></div>
+        <div class="card grow" style="padding:10px; text-align:center;"><div style="font-weight:800;">₱8k+</div><div class="muted" style="font-size:10.5px;">Starting rate</div></div>
+      </div>
+
+      <div class="section-label" style="margin-top:0;">About</div>
+      <div class="muted small" style="line-height:1.6; margin-bottom:18px;">Julia helps clients turn empty rooms into finished spaces using live AR mock-ups, so you can see furniture placement before anything is purchased. Specializes in warm minimalist interiors with natural materials.</div>
+
+      <div class="section-label">Recent Work</div>
+      <div class="row gap10" style="overflow-x:auto; margin-bottom:18px;">
+        <img src="${IMG.portfolio1}" style="width:110px;height:110px;border-radius:12px;object-fit:cover; flex-shrink:0;">
+        <img src="${IMG.portfolio2}" style="width:110px;height:110px;border-radius:12px;object-fit:cover; flex-shrink:0;">
+        <img src="${IMG.room_modern}" style="width:110px;height:110px;border-radius:12px;object-fit:cover; flex-shrink:0;">
+      </div>
+
+      <div class="section-label">Reviews</div>
+      ${reviewRow('avatar_sarah','Sarah J.','Bringing design to life! AR mock-ups completely changed how confident I felt picking pieces.',5)}
+      ${reviewRow('avatar_markp','Mark P.','Very professional and attentive to detail. Highly recommend!',5)}
+    </div>
+    <div class="bottom-cta row gap10">
+      <button class="btn btn-outline" style="flex:1;" onclick="goTo('designer-directory')">Message</button>
+      <button class="btn btn-primary" style="flex:2;" onclick="goTo('designer-request-sent')">Request Consultation</button>
+    </div>
+    `;
+  }
+};
+
+SCREENS['designer-request-sent'] = {
+  flow:'customer', tabbar:false, crumbs:['Hire a Designer','Request Sent'],
+  note:'Confirmation screen after a customer requests a consultation with a designer.',
+  render(){
+    return `
+    ${statusRow()}
+    <div class="col grow" style="align-items:center; justify-content:center; padding:30px; text-align:center;">
+      <div style="width:84px;height:84px;border-radius:50%;background:#E5F1E6; display:flex; align-items:center; justify-content:center; margin-bottom:22px;">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--green); display:flex; align-items:center; justify-content:center; color:#fff;">${ICON.check}</div>
+      </div>
+      <h2 style="font-size:21px; margin-bottom:8px;">Request sent!</h2>
+      <div class="muted small" style="line-height:1.6; margin-bottom:30px;">Julia Briones typically responds within 24 hours. You'll get a notification once she confirms your consultation.</div>
+      <button class="btn btn-primary btn-block" onclick="goTo('services')">Back to Services</button>
+      <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="goTo('home')">Back to Home</button>
+    </div>
+    `;
+  }
+};
+
+// ---------------------------------------------------------------
+// 16. SERVICES
 // ---------------------------------------------------------------
 SCREENS['services'] = {
   flow:'customer', tabbar:true, tabKey:'services', crumbs:['Main UI','Services'],
@@ -635,7 +739,7 @@ SCREENS['services'] = {
         ${serviceTile(ICON.camera,'AR Scan','Place furniture in your room', ()=>goTo('ar-scan-launch'))}
         ${serviceTile(ICON.store,'Partner Stores','Browse curated shops', ()=>goTo('stores'))}
         ${serviceTile(ICON.users,'Community','Get inspired by others', ()=>goTo('community'))}
-        ${serviceTile(ICON.briefcase,'Hire a Designer','Work with a pro', ()=>goTo('d-login'))}
+        ${serviceTile(ICON.briefcase,'Hire a Designer','Work with a pro', ()=>goTo('designer-directory'))}
       </div>
       <div class="section-label">Account</div>
       <div class="card" style="padding:4px 16px;">

@@ -108,7 +108,7 @@ SCREENS['ar-scan-walls'] = {
   note:'Live 4D scan: the app labels detected surfaces as it maps the room. Tap Done once enough surfaces are mapped, or Skip to use defaults.',
   render(){
     return `
-    <div class="ar-bg" style="background:linear-gradient(160deg,#cfe0db,#9fb6c4 50%,#7a93a8);">
+    <div class="ar-bg" style="background-image: linear-gradient(160deg, rgba(180,210,205,0.55), rgba(122,147,168,0.6) 55%, rgba(70,90,110,0.65)), url('https://images.unsplash.com/photo-1721395290083-895bf53d6178?w=900&q=75'); background-size:cover; background-position:center 38%;">
       <div class="ar-floor" style="opacity:0.35;"></div>
       <svg viewBox="0 0 375 500" style="position:absolute; inset:0; width:100%; height:100%; opacity:0.55;">
         ${Array.from({length:8}).map((_,i)=>`<line x1="${i*50}" y1="0" x2="${i*50-90}" y2="500" stroke="#fff" stroke-width="1"/>`).join('')}
@@ -237,13 +237,13 @@ SCREENS['ar-placement'] = {
         <div class="icon-btn" onclick="goTo('ar-more-options')" style="background:rgba(255,255,255,0.85);">${ICON.dots}</div>
       </div>
       <div class="grow" style="position:relative;">
-        <div class="ar-object-photo" style="width:220px; bottom:90px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
         <svg viewBox="0 0 375 420" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
-          <line x1="40" y1="270" x2="155" y2="270" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
-          <circle cx="40" cy="270" r="4" fill="#fff"/>
-          <circle cx="155" cy="270" r="4" fill="#fff"/>
+          <line x1="40" y1="200" x2="40" y2="287" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
+          <circle cx="40" cy="200" r="4" fill="#fff"/>
+          <circle cx="40" cy="287" r="4" fill="#fff"/>
         </svg>
-        <div class="ar-chip" style="position:absolute; top:255px; left:55px;">120 cm</div>
+        <div class="ar-chip" style="position:absolute; top:175px; left:55px;">120 cm</div>
+        <div class="ar-object-photo" style="width:220px; bottom:90px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
         <div class="row gap10" style="position:absolute; top:10px; right:14px; flex-direction:column;">
           <div class="ar-side-btn" onclick="goTo('ar-materials')">${ICON.paint}</div>
           <div class="ar-side-btn">${ICON.rotate}</div>
@@ -299,15 +299,17 @@ SCREENS['ar-warning'] = {
 // ---------------------------------------------------------------
 SCREENS['ar-materials'] = {
   flow:'customer', tabbar:false, crumbs:['AR Scan Mode','Store Materials'],
-  note:'Swap the upholstery / finish on the placed item in real time, browsing materials sold by the store.',
+  note:'Swap the upholstery on the placed item. Boucle Cream and Charcoal Boucle are fully functional — tap either to swap the real product photo. The remaining swatches are shown as coming soon.',
   afterRender(wrap){
-    const preview = wrap.querySelector('#materialSofaPreview');
-    wrap.querySelectorAll('.material-dot').forEach(dot=>{
-      dot.addEventListener('click', (e)=>{
+    const previewImg = wrap.querySelector('#materialSofaPreview img');
+    const label = wrap.querySelector('#materialSelectedLabel');
+    wrap.querySelectorAll('.material-swatch[data-src]').forEach(sw=>{
+      sw.addEventListener('click', (e)=>{
         e.stopPropagation();
-        wrap.querySelectorAll('.material-dot').forEach(d=>d.style.border = '2px solid #fff');
-        dot.style.border = '3px solid var(--gold)';
-        if (preview) preview.style.filter = dot.dataset.filter + ' drop-shadow(0 16px 14px rgba(0,0,0,0.4))';
+        wrap.querySelectorAll('.material-swatch').forEach(s=>s.style.borderColor = 'var(--line)');
+        sw.style.borderColor = 'var(--gold)';
+        if (previewImg) previewImg.src = sw.dataset.src;
+        if (label) label.textContent = sw.dataset.label;
       });
     });
   },
@@ -326,31 +328,35 @@ SCREENS['ar-materials'] = {
       </div>
       <div style="position:relative; z-index:2; background:rgba(255,255,255,0.97); border-radius:22px 22px 0 0; padding:16px 16px 26px;">
         <div class="search-bar" style="margin:0 0 12px;">${ICON.search}<input placeholder="Search materials..."></div>
-        <div class="small" style="font-weight:800; margin-bottom:10px;">Browse Materials</div>
-        <div class="row gap10" style="margin-bottom:14px; overflow-x:auto;">
-          ${materialSwatch(IMG.fabric_tex,'Boucle Cream', true)}
-          ${materialSwatch(IMG.wood_tex,'Midnight Velvet', false)}
-          ${materialSwatch(IMG.sofa1,'White Fur', false)}
+        <div class="row between" style="margin-bottom:10px;">
+          <div class="small" style="font-weight:800;">Browse Materials</div>
+          <div class="small" id="materialSelectedLabel" style="font-weight:800; color:var(--tan-deep);">Boucle Cream</div>
         </div>
-        <div class="row gap10" id="materialColorDots">
-          ${[
-            {c:'#E3D6B8', f:'none', label:'Boucle Cream (original)'},
-            {c:'#8C7B5E', f:'sepia(0.5) saturate(1.4) brightness(0.85) hue-rotate(-8deg)', label:'Walnut Tan'},
-            {c:'#4A4439', f:'sepia(0.7) saturate(1.2) brightness(0.42) hue-rotate(-6deg)', label:'Charcoal'},
-            {c:'#C9A24B', f:'sepia(0.9) saturate(2.4) brightness(0.95) hue-rotate(-12deg)', label:'Gold Mustard'},
-            {c:'#7A8B85', f:'sepia(0.4) saturate(1.1) brightness(0.8) hue-rotate(70deg)', label:'Sage Green'},
-          ].map((m,i)=>`<div data-filter="${m.f}" class="material-dot" style="width:34px;height:34px;border-radius:50%;background:${m.c}; border:${i===0?'3px solid var(--gold)':'2px solid #fff'}; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:pointer;"></div>`).join('')}
+        <div class="row gap10" style="margin-bottom:6px; overflow-x:auto;">
+          ${materialSwatchReal(IMG.sofa_ar_cutout,'Boucle Cream', true)}
+          ${materialSwatchReal(IMG.sofa_ar_cutout_charcoal,'Charcoal Boucle', false)}
+          ${materialSwatchSoon('Midnight Velvet')}
+          ${materialSwatchSoon('White Fur')}
         </div>
-        <button class="btn btn-dark btn-block" style="margin-top:16px;" onclick="goTo('ar-placement')">Apply Material</button>
+        <div class="muted small" style="margin-bottom:14px;">Tap Boucle Cream or Charcoal Boucle to preview on the real product photo above.</div>
+        <button class="btn btn-dark btn-block" onclick="goTo('ar-placement')">Apply Material</button>
       </div>
     </div>
     `;
   }
 };
-function materialSwatch(img,label,selected){
-  return `<div class="col" style="align-items:center; gap:5px; flex-shrink:0; width:64px;">
-    <img src="${img}" style="width:54px;height:54px;border-radius:10px;object-fit:cover; border:${selected?'2px solid var(--gold)':'2px solid var(--line)'};">
+function materialSwatchReal(img,label,selected){
+  return `<div class="col material-swatch" data-src="${img}" data-label="${label}" style="align-items:center; gap:5px; flex-shrink:0; width:64px; cursor:pointer;">
+    <img src="${img}" style="width:54px;height:54px;border-radius:10px;object-fit:cover; background:#f3ede0; border:2px solid ${selected?'var(--gold)':'var(--line)'};">
     <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2;">${label}</div>
+  </div>`;
+}
+function materialSwatchSoon(label){
+  return `<div class="col material-swatch" style="align-items:center; gap:5px; flex-shrink:0; width:64px; cursor:default; opacity:0.5;">
+    <div style="width:54px;height:54px;border-radius:10px; border:2px dashed var(--line); display:flex; align-items:center; justify-content:center;">
+      <div style="font-size:8.5px; font-weight:800; text-align:center; color:var(--ink-soft);">SOON</div>
+    </div>
+    <div style="font-size:9.5px; font-weight:700; text-align:center; line-height:1.2; color:var(--ink-soft);">${label}</div>
   </div>`;
 }
 
