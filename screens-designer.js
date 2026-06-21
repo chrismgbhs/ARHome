@@ -54,7 +54,7 @@ SCREENS['d-dashboard'] = {
     <div class="content" style="padding-top:8px;">
       <div class="row between" style="padding:6px 0 16px;">
         <div class="row gap10">
-          <div class="avatar" style="background-image:url('${IMG.person2}')" onclick="goTo('d-account')"></div>
+          <div class="avatar" style="background-image:url('${IMG.avatar_julia}')" onclick="goTo('d-account')"></div>
           <div>
             <div class="muted small" style="font-size:11px;">Welcome to</div>
             <div style="font-weight:800; font-size:15px;">DESIGNER PRO HUB</div>
@@ -82,9 +82,9 @@ SCREENS['d-dashboard'] = {
         <div class="section-label" style="margin:0;">Recent Activity</div>
         <div class="small" style="color:var(--tan-deep); font-weight:700; cursor:pointer;" onclick="goTo('d-clients')">View clients</div>
       </div>
-      ${activityRow('person3','Sarah J. updated', 'Contemporary Living Room moodboard')}
-      ${activityRow('person4','Mark P. confirmed', 'site visit for Office Makeover')}
-      ${activityRow('person1','Lisa W. updated', 'Long Beach Design budget')}
+      ${activityRow('avatar_sarah','Sarah J. updated', 'Contemporary Living Room moodboard')}
+      ${activityRow('avatar_markp','Mark P. confirmed', 'site visit for Office Makeover')}
+      ${activityRow('avatar_lisa','Lisa W. updated', 'Long Beach Design budget')}
 
       <div class="row between" style="align-items:baseline; margin-top:16px;">
         <div class="section-label" style="margin:0;">Your Projects</div>
@@ -122,11 +122,11 @@ SCREENS['d-clients'] = {
       <div class="pill-row">
         ${['All Clients','In Progress','Completed','On Hold'].map((p,i)=>`<div class="filter-pill ${i===0?'active':''}">${p}</div>`).join('')}
       </div>
-      ${clientRow('Sarah J.','Contemporary Living Room','In Progress','badge-gold', IMG.person3)}
-      ${clientRow('Mark P.','Office Apartment','In Progress','badge-gold', IMG.person4)}
-      ${clientRow('Julian B.','Modern Apartment','Reviewing','badge-blush', IMG.person2)}
-      ${clientRow('Lisa W.','Long Beach Design','Completed','badge-green', IMG.person1)}
-      ${clientRow('Aldo R.','Studio Refresh','Completed','badge-green', IMG.person3)}
+      ${clientRow('Sarah J.','Contemporary Living Room','In Progress','badge-gold', IMG.avatar_sarah)}
+      ${clientRow('Mark P.','Office Apartment','In Progress','badge-gold', IMG.avatar_markp)}
+      ${clientRow('Julian B.','Modern Apartment','Reviewing','badge-blush', IMG.avatar_julian)}
+      ${clientRow('Lisa W.','Long Beach Design','Completed','badge-green', IMG.avatar_lisa)}
+      ${clientRow('Aldo R.','Studio Refresh','Completed','badge-green', IMG.avatar_aldo)}
     </div>
     ${tabbar('clients','designer')}
     `;
@@ -150,7 +150,7 @@ SCREENS['d-client-detail'] = {
     <div class="content" style="padding-top:6px;">
       <div class="card" style="padding:14px; margin-bottom:16px;">
         <div class="row gap12">
-          <div class="avatar lg" style="background-image:url('${IMG.person3}')"></div>
+          <div class="avatar lg" style="background-image:url('${IMG.avatar_sarah}')"></div>
           <div class="grow">
             <div style="font-weight:800; font-size:15px;">Sarah J.</div>
             <div class="muted small">Contemporary Living Room</div>
@@ -197,8 +197,8 @@ SCREENS['d-collab'] = {
         <img src="${IMG.room_modern}" style="width:100%;height:100%;object-fit:cover;">
         <div class="badge badge-green" style="position:absolute; top:10px; left:10px;">● Live session</div>
         <div class="row" style="position:absolute; bottom:10px; right:10px; gap:-8px;">
-          <div class="avatar sm" style="background-image:url('${IMG.person3}'); border:2px solid #fff; margin-left:-8px;"></div>
-          <div class="avatar sm" style="background-image:url('${IMG.person2}'); border:2px solid #fff; margin-left:-8px;"></div>
+          <div class="avatar sm" style="background-image:url('${IMG.avatar_sarah}'); border:2px solid #fff; margin-left:-8px;"></div>
+          <div class="avatar sm" style="background-image:url('${IMG.avatar_julia}'); border:2px solid #fff; margin-left:-8px;"></div>
         </div>
       </div>
       <div class="card" style="padding:14px; margin-bottom:14px;">
@@ -209,8 +209,8 @@ SCREENS['d-collab'] = {
         <button class="btn btn-outline btn-block" onclick="goTo('ar-scan-launch')">Open AR Scan Mode</button>
       </div>
       <div class="section-label" style="margin-top:0;">Client Comment Thread</div>
-      ${commentRow('person3','Sarah J.','Love the direction of this — can we try a lighter wood tone?')}
-      ${commentRow('person2','You','Sure! Swapping the oak finish now, give me a sec.')}
+      ${commentRow('avatar_sarah','Sarah J.','Love the direction of this — can we try a lighter wood tone?')}
+      ${commentRow('avatar_julia','You','Sure! Swapping the oak finish now, give me a sec.')}
     </div>
     <div class="bottom-cta">
       <div class="search-bar" style="margin:0;"><input placeholder="Send a message to Sarah..."></div>
@@ -234,7 +234,7 @@ SCREENS['d-portfolio'] = {
     ${header('My Portfolio', {noBack:true, right:`<div class="icon-btn" onclick="goTo('d-reviews')">${ICON.star}</div>`})}
     <div class="content" style="padding-top:6px;">
       <div class="row gap12" style="margin-bottom:16px;">
-        <div class="avatar lg" style="background-image:url('${IMG.person2}')"></div>
+        <div class="avatar lg" style="background-image:url('${IMG.avatar_julia}')"></div>
         <div class="grow">
           <div style="font-weight:800; font-size:16px;">Julia Briones</div>
           <div class="muted small">Interior Designer · Manila, PH</div>
@@ -276,9 +276,9 @@ SCREENS['d-reviews'] = {
         <div class="muted small">Based on 38 reviews</div>
       </div>
       <div class="section-label" style="margin-top:0;">Recent Reviews</div>
-      ${reviewRow('person1','Sarah J.','Bringing design to life! AR mock-ups completely changed how confident I felt picking pieces.',5)}
-      ${reviewRow('person4','Mark P.','Very professional and attentive to detail. Highly recommend!',5)}
-      ${reviewRow('person3','Lisa W.','Great creativity and quick turnaround on revisions.',4)}
+      ${reviewRow('avatar_sarah','Sarah J.','Bringing design to life! AR mock-ups completely changed how confident I felt picking pieces.',5)}
+      ${reviewRow('avatar_markp','Mark P.','Very professional and attentive to detail. Highly recommend!',5)}
+      ${reviewRow('avatar_lisa','Lisa W.','Great creativity and quick turnaround on revisions.',4)}
     </div>
     `;
   }
@@ -303,16 +303,16 @@ SCREENS['d-account'] = {
     ${header('Account', {noBack:true})}
     <div class="content" style="padding-top:6px;">
       <div class="row gap14" style="padding:8px 4px 22px;">
-        <div class="avatar lg" style="background-image:url('${IMG.person2}')"></div>
+        <div class="avatar lg" style="background-image:url('${IMG.avatar_julia}')"></div>
         <div>
           <div style="font-weight:800; font-size:16px;">Julia Briones</div>
           <div class="muted small">julia.briones@studio.com</div>
-          <div class="badge badge-gold" style="margin-top:6px;">Pro Plan</div>
+          <div class="badge badge-gold" style="margin-top:6px;">ARHome Plus</div>
         </div>
       </div>
       <div class="card" style="padding:4px 16px;">
         ${listRow(ICON.edit,'Edit Profile','Bio, specialties, portfolio photo')}
-        ${listRow(ICON.briefcase,'Subscription','Pro plan · renews Jul 18', ()=>goTo('d-subscription'))}
+        ${listRow(ICON.briefcase,'Subscription','ARHome Plus · renews Jul 18', ()=>goTo('d-subscription'))}
         ${listRow(ICON.card,'Payouts','Manage your earnings')}
         ${listRow(ICON.settings,'Settings','Notifications, privacy')}
       </div>
@@ -327,16 +327,25 @@ SCREENS['d-account'] = {
 
 SCREENS['d-subscription'] = {
   flow:'designer', tabbar:false, crumbs:['Account','Subscription'],
-  note:'Plan tiers for designers. Selecting a plan returns to the dashboard.',
+  note:'Plan tiers match the Sales & Customer Service pricing strategy: a primary subscription ladder plus a secondary pay-per-use token option.',
   render(){
     return `
     ${statusRow()}
     ${header('Subscription', {right:''})}
     <div class="content" style="padding-top:6px;">
-      <div class="muted small" style="margin-bottom:18px;">Manage your AR Home Pro plan and features.</div>
-      ${planCard('Basic','Free','Browse client leads, 1 active project',false)}
-      ${planCard('Pro','₱899/mo','Unlimited projects, Collaboration Hub, AR mark-up',true)}
-      ${planCard('Studio','₱2,499/mo','Everything in Pro + team seats & analytics',false)}
+      <div class="section-label" style="margin-top:0;">Primary — Subscription</div>
+      ${planCard('Basic','Free','Color swap only',false)}
+      ${planCard('ARHome Plus','₱199/mo','Full features, partner access',true)}
+      ${planCard('ARHome Pro','₱349/mo','Priority AI, enterprise tools',false)}
+
+      <div class="section-label">Secondary — Pay Per Use</div>
+      <div class="role-card" style="align-items:flex-start; cursor:default;">
+        <div class="ric">${ICON.camera}</div>
+        <div class="grow">
+          <div class="row between"><div style="font-weight:800; font-size:14.5px;">Token System</div><div style="font-weight:800; color:var(--tan-deep);">₱10 / image</div></div>
+          <div class="muted small" style="margin-top:4px;">Pay only for what you generate. Basic features only — no subscription required.</div>
+        </div>
+      </div>
     </div>
     <div class="bottom-cta">
       <button class="btn btn-dark btn-block" onclick="goTo('d-dashboard')">Confirm Plan</button>

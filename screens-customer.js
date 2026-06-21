@@ -50,7 +50,7 @@ SCREENS['splash'] = {
         </div>
         <div>
           <div style="font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:#3a2c18;">AR Home</div>
-          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Where vision meets the reality</div>
+          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Design it before you buy it</div>
         </div>
         <div class="hint-pill" style="margin-top:30px; background:rgba(58,44,24,0.85);">Tap to begin →</div>
       </div>
@@ -63,7 +63,7 @@ SCREENS['splash'] = {
 // ---------------------------------------------------------------
 SCREENS['onboarding'] = {
   flow:'customer', tabbar:false, crumbs:['Onboarding'],
-  note:'A quick value-prop slide before login. Continue to sign in.',
+  note:'A quick value-prop slide before choosing a role. Continue to pick Customer or Interior Designer.',
   render(){
     return `
     <div class="col grow" style="height:100%;">
@@ -79,8 +79,8 @@ SCREENS['onboarding'] = {
             <div style="width:6px;height:6px;border-radius:4px;background:var(--line);"></div>
             <div style="width:6px;height:6px;border-radius:4px;background:var(--line);"></div>
           </div>
-          <button class="btn btn-primary btn-block" onclick="goTo('login')">Get Started</button>
-          <button class="btn btn-outline btn-block" onclick="goTo('login')">I already have an account</button>
+          <button class="btn btn-primary btn-block" onclick="goTo('role-select')">Get Started</button>
+          <button class="btn btn-outline btn-block" onclick="goTo('role-select')">I already have an account</button>
         </div>
       </div>
     </div>`;
@@ -88,11 +88,46 @@ SCREENS['onboarding'] = {
 };
 
 // ---------------------------------------------------------------
-// 3. LOGIN
+// 3. ROLE SELECT — now comes before login
+// ---------------------------------------------------------------
+SCREENS['role-select'] = {
+  flow:'customer', tabbar:false, crumbs:['Onboarding','Choose Role'],
+  note:'Role selection comes first. Customer continues to the customer login; Interior Designer continues to the designer login.',
+  render(){
+    return `
+    ${statusRow()}
+    ${header('Choose your Role')}
+    <div class="content" style="padding-top:14px;">
+      <div class="muted small" style="margin-bottom:20px;">Tell us how you'll use AR Home so we can tailor your experience.</div>
+      <div class="role-card selected" onclick="goTo('login')">
+        <div class="ric">${ICON.user}</div>
+        <div class="grow">
+          <div style="font-weight:800; font-size:14.5px;">Customer</div>
+          <div class="muted small">Shop for furniture, place pieces in your room, and order</div>
+        </div>
+        <div class="chev">${ICON.chevR}</div>
+      </div>
+      <div class="role-card" onclick="goTo('d-login')">
+        <div class="ric">${ICON.briefcase}</div>
+        <div class="grow">
+          <div style="font-weight:800; font-size:14.5px;">Interior Designer</div>
+          <div class="muted small">Manage clients, build mood boards, and grow your practice</div>
+        </div>
+        <div class="chev">${ICON.chevR}</div>
+      </div>
+      <div class="bottom-cta" style="position:static; padding:22px 0 0;">
+        <button class="btn btn-primary btn-block" onclick="goTo('login')">Continue</button>
+      </div>
+    </div>`;
+  }
+};
+
+// ---------------------------------------------------------------
+// 4. LOGIN — now comes after role selection
 // ---------------------------------------------------------------
 SCREENS['login'] = {
   flow:'customer', tabbar:false, crumbs:['Onboarding','Login'],
-  note:'Standard auth screen. Logging in routes to role selection first time, or straight Home after.',
+  note:'Standard auth screen, reached after picking the Customer role. Logging in goes straight to the Home feed.',
   render(){
     return `
     ${statusRow()}
@@ -111,48 +146,13 @@ SCREENS['login'] = {
         <label class="row gap6" style="font-size:12px; color:var(--ink-soft);"><input type="checkbox" checked style="accent-color:var(--gold);"> Remember me</label>
         <span class="small" style="color:var(--tan-deep); font-weight:700; cursor:pointer;">Forgot Password?</span>
       </div>
-      <button class="btn btn-primary btn-block" onclick="goTo('role-select')">Login</button>
+      <button class="btn btn-primary btn-block" onclick="goTo('home')">Login</button>
       <div class="center-text small muted" style="margin:18px 0;">or continue with</div>
       <div class="row gap10">
         <button class="btn btn-outline" style="flex:1;">Google</button>
         <button class="btn btn-outline" style="flex:1;">Facebook</button>
       </div>
-      <div class="center-text small" style="margin-top:22px; color:var(--ink-soft);">Don't have an account? <span style="color:var(--tan-deep); font-weight:800; cursor:pointer;" onclick="goTo('role-select')">Sign up</span></div>
-    </div>`;
-  }
-};
-
-// ---------------------------------------------------------------
-// 4. ROLE SELECT
-// ---------------------------------------------------------------
-SCREENS['role-select'] = {
-  flow:'customer', tabbar:false, crumbs:['Onboarding','Choose Role'],
-  note:'New accounts pick a role. Customer goes to the shopping Home feed; Interior Designer jumps to the Pro Hub flow.',
-  render(){
-    return `
-    ${statusRow()}
-    ${header('Choose your Role')}
-    <div class="content" style="padding-top:14px;">
-      <div class="muted small" style="margin-bottom:20px;">Tell us how you'll use AR Home so we can tailor your experience.</div>
-      <div class="role-card selected" onclick="goTo('home')">
-        <div class="ric">${ICON.user}</div>
-        <div class="grow">
-          <div style="font-weight:800; font-size:14.5px;">Customer</div>
-          <div class="muted small">Shop for furniture, place pieces in your room, and order</div>
-        </div>
-        <div class="chev">${ICON.chevR}</div>
-      </div>
-      <div class="role-card" onclick="goTo('d-login')">
-        <div class="ric">${ICON.briefcase}</div>
-        <div class="grow">
-          <div style="font-weight:800; font-size:14.5px;">Interior Designer</div>
-          <div class="muted small">Manage clients, build mood boards, and grow your practice</div>
-        </div>
-        <div class="chev">${ICON.chevR}</div>
-      </div>
-      <div class="bottom-cta" style="position:static; padding:22px 0 0;">
-        <button class="btn btn-primary btn-block" onclick="goTo('home')">Continue</button>
-      </div>
+      <div class="center-text small" style="margin-top:22px; color:var(--ink-soft);">Don't have an account? <span style="color:var(--tan-deep); font-weight:800; cursor:pointer;" onclick="goTo('home')">Sign up</span></div>
     </div>`;
   }
 };
@@ -169,7 +169,7 @@ SCREENS['home'] = {
     <div class="content" style="padding-top:8px;">
       <div class="row between" style="padding:6px 0 16px;">
         <div class="row gap10">
-          <div class="avatar" style="background-image:url('${IMG.person1}')" onclick="goTo('account')" style="cursor:pointer;"></div>
+          <div class="avatar" style="background-image:url('${IMG.avatar_yuan}')" onclick="goTo('account')" style="cursor:pointer;"></div>
           <div>
             <div class="muted small" style="font-size:11px;">Welcome back,</div>
             <div style="font-weight:800; font-size:15px;">Yuan Mendoza</div>
@@ -435,7 +435,7 @@ SCREENS['account'] = {
     ${header('My Account', {noBack:true})}
     <div class="content" style="padding-top:6px;">
       <div class="row gap14" style="padding:8px 4px 22px;">
-        <div class="avatar lg" style="background-image:url('${IMG.person1}')"></div>
+        <div class="avatar lg" style="background-image:url('${IMG.avatar_yuan}')"></div>
         <div>
           <div style="font-weight:800; font-size:16px;">Yuan Mendoza</div>
           <div class="muted small">yuan.mendoza@email.com</div>
@@ -480,9 +480,9 @@ SCREENS['community'] = {
     <div class="content" style="padding-top:6px;">
       <div class="search-bar"><input placeholder="Search your space..."></div>
       <button class="btn btn-primary btn-block" style="margin-bottom:16px;" onclick="goTo('post-create')">${ICON.plus} Post your space</button>
-      ${communityPost(IMG.community1,'person2','Chris G.','Finally found the perfect rug for my reading nook 🤍','24')}
-      ${communityPost(IMG.community2,'person3','Mark R.','Mid-century redo complete! Swipe to see before/after.','58')}
-      ${communityPost(IMG.room_cozy,'person4','Lia S.','Small space, big cozy energy. Tagged everything below 👇','19')}
+      ${communityPost(IMG.community1,'avatar_chris','Chris G.','Finally found the perfect rug for my reading nook 🤍','24')}
+      ${communityPost(IMG.community2,'avatar_markr','Mark R.','Mid-century redo complete! Swipe to see before/after.','58')}
+      ${communityPost(IMG.room_cozy,'avatar_lia','Lia S.','Small space, big cozy energy. Tagged everything below 👇','19')}
     </div>
     `;
   }

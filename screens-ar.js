@@ -237,7 +237,7 @@ SCREENS['ar-placement'] = {
         <div class="icon-btn" onclick="goTo('ar-more-options')" style="background:rgba(255,255,255,0.85);">${ICON.dots}</div>
       </div>
       <div class="grow" style="position:relative;">
-        <img src="${IMG.sofa2}" class="ar-object" style="width:220px; bottom:90px; border-radius:14px;">
+        <div class="ar-object-photo" style="width:220px; bottom:90px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
         <svg viewBox="0 0 375 420" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
           <line x1="40" y1="270" x2="155" y2="270" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
           <circle cx="40" cy="270" r="4" fill="#fff"/>
@@ -284,7 +284,7 @@ SCREENS['ar-warning'] = {
             <div class="muted small" style="margin-top:1px;">Recommended: 1.0m minimum clearance</div>
           </div>
         </div>
-        <img src="${IMG.sofa2}" class="ar-object" style="width:220px; bottom:90px; border-radius:14px; filter:drop-shadow(0 0 0 4px rgba(217,90,90,0.5)) drop-shadow(0 18px 14px rgba(0,0,0,0.35)); outline:3px solid rgba(217,90,90,0.7); outline-offset:4px; border-radius:18px;">
+        <div class="ar-object-photo" style="width:220px; bottom:90px; outline:3px solid rgba(217,90,90,0.85); outline-offset:8px; border-radius:12px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
       </div>
       <div style="position:relative; z-index:2; padding:14px 18px 30px;">
         <button class="btn btn-primary btn-block" onclick="goTo('ar-placement')">Reposition Furniture</button>
@@ -300,6 +300,17 @@ SCREENS['ar-warning'] = {
 SCREENS['ar-materials'] = {
   flow:'customer', tabbar:false, crumbs:['AR Scan Mode','Store Materials'],
   note:'Swap the upholstery / finish on the placed item in real time, browsing materials sold by the store.',
+  afterRender(wrap){
+    const preview = wrap.querySelector('#materialSofaPreview');
+    wrap.querySelectorAll('.material-dot').forEach(dot=>{
+      dot.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        wrap.querySelectorAll('.material-dot').forEach(d=>d.style.border = '2px solid #fff');
+        dot.style.border = '3px solid var(--gold)';
+        if (preview) preview.style.filter = dot.dataset.filter + ' drop-shadow(0 16px 14px rgba(0,0,0,0.4))';
+      });
+    });
+  },
   render(){
     return `
     <div class="ar-bg">
@@ -311,7 +322,7 @@ SCREENS['ar-materials'] = {
         <div class="ar-chip">Store Materials</div>
       </div>
       <div class="grow" style="position:relative;">
-        <img src="${IMG.sofa2}" class="ar-object" style="width:230px; bottom:130px; border-radius:14px;">
+        <div class="ar-object-photo" id="materialSofaPreview" style="width:230px; bottom:130px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
       </div>
       <div style="position:relative; z-index:2; background:rgba(255,255,255,0.97); border-radius:22px 22px 0 0; padding:16px 16px 26px;">
         <div class="search-bar" style="margin:0 0 12px;">${ICON.search}<input placeholder="Search materials..."></div>
@@ -321,8 +332,14 @@ SCREENS['ar-materials'] = {
           ${materialSwatch(IMG.wood_tex,'Midnight Velvet', false)}
           ${materialSwatch(IMG.sofa1,'White Fur', false)}
         </div>
-        <div class="row gap10">
-          ${['#E3D6B8','#8C7B5E','#4A4439','#C9A24B','#D9C9A8'].map((c,i)=>`<div onclick="event.stopPropagation()" style="width:34px;height:34px;border-radius:50%;background:${c}; border:${i===0?'3px solid var(--gold)':'2px solid #fff'}; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:pointer;"></div>`).join('')}
+        <div class="row gap10" id="materialColorDots">
+          ${[
+            {c:'#E3D6B8', f:'none', label:'Boucle Cream (original)'},
+            {c:'#8C7B5E', f:'sepia(0.5) saturate(1.4) brightness(0.85) hue-rotate(-8deg)', label:'Walnut Tan'},
+            {c:'#4A4439', f:'sepia(0.7) saturate(1.2) brightness(0.42) hue-rotate(-6deg)', label:'Charcoal'},
+            {c:'#C9A24B', f:'sepia(0.9) saturate(2.4) brightness(0.95) hue-rotate(-12deg)', label:'Gold Mustard'},
+            {c:'#7A8B85', f:'sepia(0.4) saturate(1.1) brightness(0.8) hue-rotate(70deg)', label:'Sage Green'},
+          ].map((m,i)=>`<div data-filter="${m.f}" class="material-dot" style="width:34px;height:34px;border-radius:50%;background:${m.c}; border:${i===0?'3px solid var(--gold)':'2px solid #fff'}; box-shadow:0 2px 6px rgba(0,0,0,0.15); cursor:pointer;"></div>`).join('')}
         </div>
         <button class="btn btn-dark btn-block" style="margin-top:16px;" onclick="goTo('ar-placement')">Apply Material</button>
       </div>
@@ -424,7 +441,7 @@ SCREENS['ar-live-capture'] = {
             <div class="muted small">Furniture too close to wall (0.5m). Recommended: 1.0m minimum.</div>
           </div>
         </div>
-        <img src="${IMG.sofa2}" class="ar-object" style="width:210px; bottom:90px; border-radius:14px;">
+        <div class="ar-object-photo" style="width:210px; bottom:90px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
       </div>
       <div class="ar-shutter-row" style="position:relative; z-index:2; bottom:0; padding-bottom:28px;">
         <div class="ar-side-btn" onclick="goTo('ar-more-options')">${ICON.settings}</div>
@@ -446,7 +463,7 @@ SCREENS['ar-capture-result'] = {
     return `
     <div style="position:relative; height:100%;">
       <img src="${IMG.floor_room}" style="width:100%;height:100%;object-fit:cover; position:absolute; inset:0;">
-      <img src="${IMG.sofa2}" style="position:absolute; bottom:160px; left:50%; transform:translateX(-50%); width:230px; border-radius:14px; filter:drop-shadow(0 18px 14px rgba(0,0,0,0.35));">
+      <div class="ar-object-photo" style="bottom:160px; width:230px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
       <div style="position:relative; z-index:2;">${statusRow()}</div>
       <div style="position:relative; z-index:2;" class="header-row">
         <div class="icon-btn" onclick="goTo('ar-placement')" style="background:rgba(255,255,255,0.9);">${ICON.close}</div>
