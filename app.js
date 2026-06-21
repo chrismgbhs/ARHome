@@ -15,9 +15,31 @@ function renderAllScreens(){
     wrap.className = 'screen' + (def.tabbar ? ' has-tabbar' : '');
     wrap.id = 'screen-' + id;
     wrap.innerHTML = def.render();
+    restructureScreenScroll(wrap);
     viewport.appendChild(wrap);
     if (def.afterRender) def.afterRender(wrap);
   });
+}
+
+// Splits a screen's children into a scrollable region (status row, header,
+// content, anything else) and a pinned region (.bottom-cta, .tabbar) so the
+// pinned elements never move when the scrollable content overflows.
+function restructureScreenScroll(wrap){
+  const pinnedSelectors = ['.bottom-cta', '.tabbar'];
+  const children = Array.from(wrap.children);
+  const pinned = [];
+  const scrollable = [];
+  children.forEach(child=>{
+    const isPinned = pinnedSelectors.some(sel => child.matches(sel));
+    (isPinned ? pinned : scrollable).push(child);
+  });
+  if (pinned.length === 0) return; // nothing to pin, leave as-is (e.g. full-bleed AR/splash screens)
+  const scroller = document.createElement('div');
+  scroller.className = 'screen-scroll';
+  scrollable.forEach(el => scroller.appendChild(el));
+  wrap.innerHTML = '';
+  wrap.appendChild(scroller);
+  pinned.forEach(el => wrap.appendChild(el));
 }
 
 function goTo(id, opts={}){

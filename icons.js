@@ -65,7 +65,7 @@ const IMG = {
   storefront: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80",
   wood_tex: "https://images.unsplash.com/photo-1473445730015-841f29a9490b?w=400&q=80",
   fabric_tex: "https://images.unsplash.com/photo-1620207418302-439b387441b0?w=400&q=80",
-  floor_room: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&q=80",
+  floor_room: "https://images.unsplash.com/photo-1665507299418-87f6abb3c846?w=700&q=80",
   person1: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
   person2: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80",
   person3: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
