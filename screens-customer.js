@@ -28,10 +28,10 @@ function tabbar(activeKey, flow){
   }
   return `<div class="tabbar">
     <button class="tab-item" data-tab="home" onclick="goTo('home')">${ICON.home}<span>Home</span></button>
-    <button class="tab-item" data-tab="explore" onclick="goTo('browse')">${ICON.compass}<span>Explore</span></button>
-    <button class="tab-item" data-tab="scan" onclick="goTo('ar-scan-launch')"><div class="fab">${ICON.scan}</div></button>
     <button class="tab-item" data-tab="saved" onclick="goTo('saved')">${ICON.heart}<span>Saved</span></button>
-    <button class="tab-item" data-tab="account" onclick="goTo('account')">${ICON.user}<span>Account</span></button>
+    <button class="tab-item" data-tab="scan" onclick="goTo('ar-scan-launch')"><div class="fab">${ICON.camera}</div></button>
+    <button class="tab-item" data-tab="explore" onclick="goTo('browse')">${ICON.compass}<span>Explore</span></button>
+    <button class="tab-item" data-tab="services" onclick="goTo('services')">${ICON.layout}<span>Services</span></button>
   </div>`;
 }
 
@@ -427,7 +427,7 @@ SCREENS['order-success'] = {
 // 11. ACCOUNT
 // ---------------------------------------------------------------
 SCREENS['account'] = {
-  flow:'customer', tabbar:true, tabKey:'account', crumbs:['Main UI','My Account'],
+  flow:'customer', tabbar:true, tabKey:'', crumbs:['Main UI','My Account'],
   note:'Account settings menu. Each row is tappable; Logout returns to the splash screen.',
   render(){
     return `
@@ -624,8 +624,8 @@ function orderHistRow(id,status,total){
 // 15. SERVICES
 // ---------------------------------------------------------------
 SCREENS['services'] = {
-  flow:'customer', tabbar:false, crumbs:['Main UI','Services'],
-  note:'Services hub linking to AR tools and store directory.',
+  flow:'customer', tabbar:true, tabKey:'services', crumbs:['Main UI','Services'],
+  note:'Services hub linking to AR tools, stores, community, and account.',
   render(){
     return `
     ${statusRow()}
@@ -637,8 +637,13 @@ SCREENS['services'] = {
         ${serviceTile(ICON.users,'Community','Get inspired by others', ()=>goTo('community'))}
         ${serviceTile(ICON.briefcase,'Hire a Designer','Work with a pro', ()=>goTo('d-login'))}
       </div>
+      <div class="section-label">Account</div>
+      <div class="card" style="padding:4px 16px;">
+        ${listRow(ICON.user,'My Account','Profile, payments, settings', ()=>goTo('account'))}
+        ${listRow(ICON.activity,'Order History','Track past purchases', ()=>goTo('order-history'))}
+      </div>
     </div>
-    ${tabbar('','customer')}
+    ${tabbar('services','customer')}
     `;
   }
 };
