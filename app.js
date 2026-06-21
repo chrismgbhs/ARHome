@@ -24,16 +24,24 @@ function renderAllScreens(){
 // Splits a screen's children into a scrollable region (status row, header,
 // content, anything else) and a pinned region (.bottom-cta, .tabbar) so the
 // pinned elements never move when the scrollable content overflows.
+// Full-bleed custom layouts (AR screens, splash, onboarding) are detected by
+// having a single child that already manages its own height/scroll, and are
+// left untouched.
 function restructureScreenScroll(wrap){
-  const pinnedSelectors = ['.bottom-cta', '.tabbar'];
   const children = Array.from(wrap.children);
+  if (children.length === 0) return;
+
+  // Full-bleed screens render a single root element (e.g. .ar-bg, or a custom
+  // col layout) that already fills height:100% itself — don't touch those.
+  if (children.length === 1) return;
+
+  const pinnedSelectors = ['.bottom-cta', '.tabbar'];
   const pinned = [];
   const scrollable = [];
   children.forEach(child=>{
     const isPinned = pinnedSelectors.some(sel => child.matches(sel));
     (isPinned ? pinned : scrollable).push(child);
   });
-  if (pinned.length === 0) return; // nothing to pin, leave as-is (e.g. full-bleed AR/splash screens)
   const scroller = document.createElement('div');
   scroller.className = 'screen-scroll';
   scrollable.forEach(el => scroller.appendChild(el));
@@ -73,6 +81,12 @@ function showScreen(id, silent=false){
   vp.scrollTop = 0;
   updateSidePanel(id);
   updateTabbarHighlight(id);
+  // fire layout-dependent init now that the screen is actually display:flex
+  // (afterRender ran while every screen was still display:none, so anything
+  // reading offsetWidth/getBoundingClientRect there saw zeroes)
+  if (def && def.onActivate && target) {
+    requestAnimationFrame(()=> def.onActivate(target));
+  }
 }
 
 function updateTabbarHighlight(id){
@@ -132,6 +146,7 @@ const QUICKLINKS_CUSTOMER = [
   {label:'⑲ My Account', id:'account'},
   {label:'⑳ Community', id:'community'},
   {label:'㉑ Partner Stores', id:'stores'},
+  {label:'㉑b Store Direct Chat', id:'store-chat'},
   {label:'㉒ Saved Items', id:'saved'},
   {label:'㉓ Services', id:'services'},
   {label:'㉔ Hire a Designer', id:'designer-directory'},

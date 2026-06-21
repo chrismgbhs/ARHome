@@ -6,6 +6,76 @@
 // -> More Options -> Live capture -> Static result
 // ============================================================
 
+// ============================================================
+// Shared drag/zone logic for the draggable AR placement screen.
+// Pulled out to module scope so both afterRender (listener setup, runs
+// once) and onActivate (initial position calc, runs every time the screen
+// becomes visible) can call the same math.
+// ============================================================
+const AR_PX_PER_CM = 0.96; // matches the 120cm line ≈115px scale used elsewhere on this screen
+const AR_WALL_MARGIN_X = 26;
+
+function arPlacementClampAndZone(wrap, left, top){
+  const stage = wrap.querySelector('#placeStage');
+  const obj = wrap.querySelector('#dragSofa');
+  const stageRect = stage.getBoundingClientRect();
+  const objW = obj.offsetWidth || 220;
+  const objH = obj.offsetHeight || 104;
+  const minLeft = AR_WALL_MARGIN_X;
+  const maxLeft = stageRect.width - objW - AR_WALL_MARGIN_X;
+  const minTop = 30;
+  const maxTop = stageRect.height - objH - 26;
+  left = Math.max(minLeft, Math.min(maxLeft, left));
+  top = Math.max(minTop, Math.min(maxTop, top));
+
+  const distToBackWallPx = top - minTop;
+  const distToBackWallCm = Math.round(distToBackWallPx / AR_PX_PER_CM);
+  const distToLeftWall = left - minLeft;
+  const distToRightWall = maxLeft - left;
+  const nearestSideWallPx = Math.min(distToLeftWall, distToRightWall);
+
+  let zone = 'green';
+  if (nearestSideWallPx < 6 || distToBackWallCm < 35) {
+    zone = 'red';
+  } else if (distToBackWallCm < 100 || nearestSideWallPx < 30) {
+    zone = 'yellow';
+  }
+
+  return { left, top, zone, distToBackWallCm, objW, objH, minTop };
+}
+
+function arPlacementApplyZone(wrap, state){
+  const glow = wrap.querySelector('#zoneGlow');
+  const badge = wrap.querySelector('#zoneBadge');
+  const badgeLabel = wrap.querySelector('#zoneBadgeLabel');
+  const distLine = wrap.querySelector('#distLine');
+  const distChip = wrap.querySelector('#distChip');
+  if (!glow || !badge) return;
+
+  ['zone-green','zone-yellow','zone-red'].forEach(c=>{
+    glow.classList.remove(c); badge.classList.remove(c);
+  });
+  glow.classList.add('zone-'+state.zone);
+  badge.classList.add('zone-'+state.zone);
+  const labels = { green:'Good placement', yellow:'Getting close', red:'Too close — move it' };
+  if (badgeLabel) badgeLabel.textContent = labels[state.zone];
+
+  if (distLine) {
+    const x = state.left + state.objW/2;
+    distLine.setAttribute('x1', x); distLine.setAttribute('x2', x);
+    distLine.setAttribute('y1', state.minTop); distLine.setAttribute('y2', state.top);
+    const c1 = distLine.parentElement.querySelector('.distDotTop');
+    const c2 = distLine.parentElement.querySelector('.distDotBottom');
+    if (c1){ c1.setAttribute('cx', x); c1.setAttribute('cy', state.minTop); }
+    if (c2){ c2.setAttribute('cx', x); c2.setAttribute('cy', state.top); }
+  }
+  if (distChip){
+    distChip.textContent = state.distToBackWallCm + ' cm';
+    distChip.style.left = (state.left + state.objW/2) + 'px';
+    distChip.style.top = (state.top - 26) + 'px';
+  }
+}
+
 function arHeader(title, opts={}){
   const right = opts.right || '';
   return `<div class="header-row" style="background:#fff; flex-shrink:0;">
@@ -223,7 +293,58 @@ SCREENS['ar-confirm-dimension'] = {
 // ---------------------------------------------------------------
 SCREENS['ar-placement'] = {
   flow:'customer', tabbar:false, crumbs:['AR Scan Mode','Step 4 · Place'],
-  note:'Furniture placed to scale with a live distance line to the nearest wall. Drag to reposition (static here), rotate, swap materials, or open More Options.',
+  note:'Furniture placed to scale. Drag the sofa anywhere on the floor — a live badge and glow under the sofa turn green when there\'s enough clearance, yellow when it\'s getting close, and red when it\'s blocking the wall or another object.',
+  afterRender(wrap){
+    const stage = wrap.querySelector('#placeStage');
+    const obj = wrap.querySelector('#dragSofa');
+    if (!stage || !obj) return;
+
+    let dragging = false;
+    let startX=0, startY=0, startLeft=0, startTop=0;
+
+    function pointerDown(e){
+      dragging = true;
+      obj.classList.add('dragging');
+      const p = e.touches ? e.touches[0] : e;
+      startX = p.clientX; startY = p.clientY;
+      startLeft = obj.offsetLeft; startTop = obj.offsetTop;
+      e.preventDefault();
+    }
+    function pointerMove(e){
+      if (!dragging) return;
+      const p = e.touches ? e.touches[0] : e;
+      const dx = p.clientX - startX;
+      const dy = p.clientY - startY;
+      const result = arPlacementClampAndZone(wrap, startLeft + dx, startTop + dy);
+      obj.style.left = result.left + 'px';
+      obj.style.top = result.top + 'px';
+      arPlacementApplyZone(wrap, result);
+    }
+    function pointerUp(){
+      if (!dragging) return;
+      dragging = false;
+      obj.classList.remove('dragging');
+    }
+
+    obj.addEventListener('mousedown', pointerDown);
+    obj.addEventListener('touchstart', pointerDown, {passive:false});
+    window.addEventListener('mousemove', pointerMove);
+    window.addEventListener('touchmove', pointerMove, {passive:false});
+    window.addEventListener('mouseup', pointerUp);
+    window.addEventListener('touchend', pointerUp);
+  },
+  onActivate(wrap){
+    // (Re)computes the initial zone now that the screen is actually
+    // display:flex and real layout dimensions are available. afterRender
+    // runs once while every screen is still display:none, so offsetWidth /
+    // getBoundingClientRect would all read 0 there — this hook fixes that.
+    const obj = wrap.querySelector('#dragSofa');
+    if (!obj) return;
+    const initial = arPlacementClampAndZone(wrap, obj.offsetLeft, obj.offsetTop);
+    obj.style.left = initial.left + 'px';
+    obj.style.top = initial.top + 'px';
+    arPlacementApplyZone(wrap, initial);
+  },
   render(){
     return `
     <div class="ar-bg">
@@ -236,15 +357,19 @@ SCREENS['ar-placement'] = {
         <div class="header-spacer"></div>
         <div class="icon-btn" onclick="goTo('ar-more-options')" style="background:rgba(255,255,255,0.85);">${ICON.dots}</div>
       </div>
-      <div class="grow" style="position:relative;">
-        <svg viewBox="0 0 375 420" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;">
-          <line x1="40" y1="200" x2="40" y2="287" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
-          <circle cx="40" cy="200" r="4" fill="#fff"/>
-          <circle cx="40" cy="287" r="4" fill="#fff"/>
+      <div class="grow" id="placeStage" style="position:relative; overflow:hidden;">
+        <div class="ar-zone-badge zone-green" id="zoneBadge"><span class="dot"></span><span id="zoneBadgeLabel">Good placement</span></div>
+        <svg style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:4;">
+          <line id="distLine" x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/>
+          <circle class="distDotTop" cx="0" cy="0" r="4" fill="#fff"/>
+          <circle class="distDotBottom" cx="0" cy="0" r="4" fill="#fff"/>
         </svg>
-        <div class="ar-chip" style="position:absolute; top:175px; left:55px;">120 cm</div>
-        <div class="ar-object-photo" style="width:220px; bottom:90px;"><img src="${IMG.sofa_ar_cutout}" alt="Room Sofa"></div>
-        <div class="row gap10" style="position:absolute; top:10px; right:14px; flex-direction:column;">
+        <div class="ar-chip" id="distChip" style="position:absolute; transform:translate(-50%,-100%);">120 cm</div>
+        <div class="ar-object-draggable" id="dragSofa" style="left:67px; top:340px;">
+          <div class="ar-zone-glow zone-green" id="zoneGlow"></div>
+          <img src="${IMG.sofa_ar_cutout}" alt="Room Sofa">
+        </div>
+        <div class="row gap10" style="position:absolute; top:10px; right:14px; flex-direction:column; z-index:6;">
           <div class="ar-side-btn" onclick="goTo('ar-materials')">${ICON.paint}</div>
           <div class="ar-side-btn">${ICON.rotate}</div>
           <div class="ar-side-btn" onclick="goTo('ar-warning')">${ICON.trash}</div>

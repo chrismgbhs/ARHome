@@ -50,7 +50,7 @@ SCREENS['splash'] = {
         </div>
         <div>
           <div style="font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:#3a2c18;">AR Home</div>
-          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Where vision meets the reality</div>
+          <div style="font-size:12.5px; letter-spacing:0.18em; text-transform:uppercase; color:#6b5736; margin-top:2px;">Design it before you buy it</div>
         </div>
         <div class="hint-pill" style="margin-top:30px; background:rgba(58,44,24,0.85);">Tap to begin →</div>
       </div>
@@ -535,30 +535,92 @@ SCREENS['post-create'] = {
 // ---------------------------------------------------------------
 SCREENS['stores'] = {
   flow:'customer', tabbar:false, crumbs:['Main UI','Partner Stores'],
-  note:'Directory of partner furniture stores. Tap a store to view its catalog.',
+  note:'Directory of partner furniture stores. Tap the featured card to explore that store, or use a store tile\'s two actions: Direct Chat or View Products in AR.',
   render(){
     return `
     ${statusRow()}
     ${header('Partner Stores')}
     <div class="content" style="padding-top:6px;">
-      <div class="muted small" style="margin-bottom:16px; line-height:1.6;">Discover our exclusive network of premium partner stores curated for quality furniture across the Philippines.</div>
-      <div class="section-label" style="margin-top:0;">Featured Premium Partner</div>
-      ${storeRow('Woodley Furniture Shop','4.9 · Quezon City', IMG.storefront)}
-      ${storeRow('Casa Aria Living','4.7 · Makati', IMG.room_modern)}
-      ${storeRow('Manila Loft Co.','4.8 · Pasig', IMG.room_office)}
-      ${storeRow('Terra & Teak','4.6 · Cebu', IMG.room_cozy)}
+      <div class="muted small" style="margin-bottom:16px; line-height:1.6;">Welcome to our exclusive network of premium partner stores. Discover and interact with curated luxury brands that empower your interior vision.</div>
+
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:22px; cursor:pointer; border:1.5px solid var(--gold-soft);" onclick="goTo('browse')">
+        <div style="position:relative; height:120px;">
+          <img src="${IMG.room_modern}" style="width:100%;height:100%;object-fit:cover;">
+          <div style="position:absolute; inset:0; background:linear-gradient(0deg, rgba(20,15,5,0.55), transparent 60%);"></div>
+          <div class="badge badge-gold" style="position:absolute; top:10px; left:10px;">Featured Premium Partner</div>
+        </div>
+        <div class="row gap12" style="padding:14px;">
+          ${storeLogo('Woodley','#8C6B3D',46)}
+          <div class="grow">
+            <div class="row gap6"><div style="font-weight:800; font-size:14.5px;">Woodley Furniture Shop</div><div class="badge badge-green" style="font-size:9px; padding:2px 7px;">Verified</div></div>
+            <div class="muted small">Since 2026</div>
+            <div class="stars small" style="margin-top:2px;">${ICON.star} 4.9</div>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="margin:0 14px 14px; width:calc(100% - 28px);">Explore This Store</button>
+      </div>
+
+      <div class="section-label" style="margin-top:0;">Explore All Stores</div>
+      <div class="product-grid">
+        ${storeTile('Aura Home','Modern Comfort Redefined','#2B2622','2021',4.8)}
+        ${storeTile('Svelte Spaces','Curated Organic Living','#D9543E','2022',4.7)}
+        ${storeTile('Modern Masters','Artisan Crafted Gold','#B6863F','2020',4.9)}
+        ${storeTile('SM Home','Generalized Furniture','#2255A4','2019',4.6)}
+        ${storeTile('Urban Concepts','Home & Office Varieties','#3a2c18','2023',4.5)}
+        ${storeTile('BeLocal','Local Specialized Crafts','#2D6B8C','2022',4.7)}
+      </div>
     </div>
     `;
   }
 };
-function storeRow(name, sub, img){
-  return `<div class="card row gap12" style="padding:10px; margin-bottom:12px; cursor:pointer;" onclick="goTo('browse')">
-    <img src="${img}" style="width:54px;height:54px;border-radius:12px;object-fit:cover;">
-    <div class="grow">
-      <div class="small" style="font-weight:800;">${name}</div>
-      <div class="stars small">${sub}</div>
+function storeLogo(initial,color,size){
+  size = size || 40;
+  return `<div style="width:${size}px;height:${size}px;border-radius:12px;background:${color}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+    <span style="font-family:'Fraunces',serif; font-weight:700; color:#fff; font-size:${size*0.42}px;">${initial.charAt(0)}</span>
+  </div>`;
+}
+function storeTile(name,tagline,color,since,rating){
+  return `<div class="product-card" style="padding:12px; cursor:default;">
+    <div class="row gap10" style="margin-bottom:8px;">
+      ${storeLogo(name,color,40)}
+      <div class="grow" style="min-width:0;">
+        <div class="pname" style="font-size:12.5px;">${name}</div>
+        <div class="muted" style="font-size:10px; line-height:1.3; margin-top:1px;">${tagline}</div>
+      </div>
     </div>
-    <div class="chev">${ICON.chevR}</div>
+    <div class="muted" style="font-size:9px; margin-bottom:3px;">Partner since ${since}</div>
+    <div class="stars small" style="margin-bottom:10px;">${ICON.star} ${rating}</div>
+    <div class="row gap8">
+      <button class="btn btn-outline" style="flex:1; padding:8px 4px; font-size:10.5px; gap:4px;" onclick="goTo('store-chat')">${ICON.chat} Direct Chat</button>
+      <button class="btn btn-outline" style="flex:1; padding:8px 4px; font-size:10.5px; gap:4px;" onclick="goTo('ar-scan-launch')">${ICON.camera} View in AR</button>
+    </div>
+  </div>`;
+}
+
+SCREENS['store-chat'] = {
+  flow:'customer', tabbar:false, crumbs:['Partner Stores','Direct Chat'],
+  note:'Direct chat with a partner store — a quick way to ask about stock, custom orders, or delivery before buying.',
+  render(){
+    return `
+    ${statusRow()}
+    ${header('Woodley Furniture Shop', {right:`<div class="icon-btn">${ICON.store}</div>`})}
+    <div class="content" style="padding-top:6px; display:flex; flex-direction:column; min-height:0;">
+      <div class="grow" style="overflow-y:auto;">
+        ${chatBubble('them','Hi! Thanks for reaching out to Woodley Furniture Shop. How can we help you today?')}
+        ${chatBubble('me','Hi! Is the Room Sofa available in a 3-seater with a darker wood finish?')}
+        ${chatBubble('them','Yes! We offer walnut and espresso finishes for the 3-seater. Want me to send swatches?')}
+      </div>
+    </div>
+    <div class="bottom-cta">
+      <div class="search-bar" style="margin:0;"><input placeholder="Type a message..."></div>
+    </div>
+    `;
+  }
+};
+function chatBubble(who,text){
+  const mine = who === 'me';
+  return `<div class="row" style="justify-content:${mine?'flex-end':'flex-start'}; margin-bottom:10px;">
+    <div style="max-width:75%; padding:10px 14px; border-radius:16px; font-size:13px; line-height:1.5; ${mine ? 'background:var(--ink); color:#fff; border-bottom-right-radius:4px;' : 'background:#fff; border:1px solid var(--line); border-bottom-left-radius:4px;'}">${text}</div>
   </div>`;
 }
 
